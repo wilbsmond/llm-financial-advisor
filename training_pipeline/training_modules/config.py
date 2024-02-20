@@ -2,7 +2,7 @@ from transformers import TrainingArguments
 
 training_arguments = TrainingArguments(
     output_dir="./results",
-    num_train_epochs=8,
+    num_train_epochs=1,
     per_device_train_batch_size=4, # Batch size per GPU for training
     per_device_eval_batch_size=2, # Batch size per GPU for evaluation
     gradient_accumulation_steps=2, # Number of update steps to accumulate the gradients for
@@ -20,7 +20,7 @@ training_arguments = TrainingArguments(
     lr_scheduler_type="cosine", # Learning rate schedule
     evaluation_strategy="steps",
     eval_steps=5,
-    report_to="tensorboard", # or W&B / comet_ml
+    report_to="comet_ml", # or W&B / comet_ml
     seed=42,
     load_best_model_at_end=True
 )
