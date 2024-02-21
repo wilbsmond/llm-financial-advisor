@@ -5,12 +5,12 @@ training_app = App(
     name="train_qa",
     runtime=Runtime(
         cpu=4,
-        memory="64Gi",
+        memory="32Gi",
         gpu="A10G",
-        image=Image(python_version="python3.10", python_packages="requirements.txt"),
+        image=Image(python_version="python3.10", python_packages="reqs.txt"),
     ),
     volumes=[
-        Volume(path="./finance_qa_dataset", name="finance_qa_dataset"),
+        Volume(path="./qa_dataset", name="qa_dataset"),
         Volume(
             path="./output",
             name="train_qa_output",
@@ -39,13 +39,12 @@ def train():
     from training import TrainingAPI
     from training_modules.config import training_arguments
 
-    path_output = './output'
-    path_dataset = Path.cwd().parent / "dataset"
-    path_model_cache = "./model_cache" if path_model_cache else None
+    print("Path: ", Path.cwd())
+    path_dataset = "./qa_dataset/dataset" #"dataset"
+    path_model_cache = "./model_cache" #if path_model_cache else None
 
     training_api = TrainingAPI(
         training_config=training_arguments,
-        path_output=path_output,
         path_dataset=path_dataset,
         path_model_cache=path_model_cache,
     )

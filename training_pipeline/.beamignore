@@ -1,7 +1,7 @@
-.venv
-venv
-.idea
-.vscode
-.git
-*.pyc
-__pycache__
+model_cache/*
+results/*
+output/*
+logs/*
+.ruff_cache/*
+dataset/*
+__pycache__/**

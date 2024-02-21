@@ -111,16 +111,22 @@ class TrainingAPI:
         Returns:
             Tuple[Dataset, Dataset]: A tuple containing the training and validation datasets.
         """
+        print(f"Loading QA datasets from {self.path_dataset}")
+        logger.info(f"logger: Loading QA datasets from {self.path_dataset=}")
+
         training_dataset = data.FinanceDataset(
-                                path_data = self.path_dataset / "training_data.json",
+                                path_data = f"{self.path_dataset}/training_data.json",
                                 template_name = self.llm_template_name,
                             ).preprocess_to_llm_format()
 
         validation_dataset = data.FinanceDataset(
-                                path_data = self.path_dataset / "testing_data.json",
+                                path_data = f"{self.path_dataset}/testing_data.json",
                                 template_name = self.llm_template_name,
                             ).preprocess_to_llm_format()
         
+        logger.info(f"Training dataset size: {len(training_dataset)}")
+        logger.info(f"Validation dataset size: {len(validation_dataset)}")
+
         return training_dataset, validation_dataset
 
     def load_model(self) -> Tuple[AutoModelForCausalLM, AutoTokenizer, PeftConfig]:
@@ -131,10 +137,11 @@ class TrainingAPI:
             Tuple[AutoModelForCausalLM, AutoTokenizer, PeftConfig]: A tuple containing the model, tokenizer,
                 and PeftConfig.
         """
-
+        print(f"Loading model using {self.model_id}")
+        logger.info(f"Loading model using {self.model_id=}")
         model, tokenizer, peft_config = models.load_model(
             pretrained_model_path=self.model_id,
-            #gradient_checkpointing=True,
+            gradient_checkpointing=True,
             cache_dir=self.path_model_cache,
         )
         return model, tokenizer, peft_config
@@ -146,6 +153,8 @@ class TrainingAPI:
         Returns:
             SFTTrainer: The trained model.
         """
+        print("Training model...")
+        logger.info("Training model...")
 
         trainer = SFTTrainer(
             model = self.model,
@@ -158,7 +167,7 @@ class TrainingAPI:
             args = self.training_arguments,
             packing = True,
             compute_metrics = self.compute_metrics,
-            #callbacks=[BestModelToModelRegistryCallback(model_id=self._model_id)],
+            #callbacks=[BestModelToModelRegistryCallback(model_id=self.model_id)],
         )
         trainer.train()
 
@@ -177,10 +186,11 @@ class TrainingAPI:
         perplexity = np.exp(eval_pred.predictions.mean()).item()
         return {"perplexity": perplexity}
 
+# uncomment below to train locally, and then just run this script
+""" 
 from training_modules.config import training_arguments
 
-output_dir = './output'
-path_dataset = Path.cwd().parent / "dataset"
+path_dataset = "./dataset"
 path_model_cache = "./model_cache" #if path_model_cache else None
 
 training_api = TrainingAPI(
@@ -189,5 +199,4 @@ training_api = TrainingAPI(
     path_model_cache=path_model_cache,
 )
 training_api.train_model()
-
-# Metrics?
+"""

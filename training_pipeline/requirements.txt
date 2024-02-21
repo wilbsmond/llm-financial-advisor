@@ -1,5 +1,5 @@
 beam-sdk==0.15.9
-bitsandbytes==0.41.1 ; python_version >= "3.10" # default for non-windows
+bitsandbytes==0.41.1
 #https://github.com/jllllll/bitsandbytes-windows-webui/releases/download/wheels/bitsandbytes-0.41.1-py3-none-win_amd64.whl # bitsandbytes for windows
 comet-ml==3.35.1
 datasets==2.14.3

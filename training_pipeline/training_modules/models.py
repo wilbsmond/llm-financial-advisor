@@ -12,7 +12,7 @@ from transformers import (
 def load_model(
     pretrained_model_path: str = "tiiuae/falcon-7b-instruct",
     #peft_pretrained_model_name_or_path: Optional[str] = None,
-    #gradient_checkpointing: bool = True,
+    gradient_checkpointing: bool = True,
     cache_dir: Optional[Path] = None,
 ) -> Tuple[AutoModelForCausalLM, AutoTokenizer, PeftConfig]:
     """
