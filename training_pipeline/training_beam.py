@@ -2,7 +2,7 @@ from pathlib import Path
 from beam import App, Image, Runtime, Volume, VolumeType
 
 from training import TrainingAPI
-from training_modules.config import training_arguments
+from training_modules.configs import TrainingConfig
 from training_modules.initialize import initialize
 
 training_app = App(
@@ -47,9 +47,12 @@ def train():
 
     path_dataset = "./qa_dataset/dataset" #"dataset"
     path_model_cache = "./model_cache" #if path_model_cache else None
+    path_config = "configs/dev_training_config.yaml"
+    path_output = "./output"
 
+    training_config = TrainingConfig.from_yaml(path_config, path_output)
     training_api = TrainingAPI(
-        training_config=training_arguments,
+        training_config=training_config.training,
         path_dataset=path_dataset,
         path_model_cache=path_model_cache,
     )

@@ -167,7 +167,7 @@ class TrainingAPI:
             args = self.training_arguments,
             packing = True,
             compute_metrics = self.compute_metrics,
-            callbacks=[BestModelToModelRegistryCallback(model_id=self.model_id)],
+            #callbacks=[BestModelToModelRegistryCallback(model_id=self.model_id)],
         )
         trainer.train()
 
