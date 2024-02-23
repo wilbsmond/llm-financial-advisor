@@ -1,6 +1,10 @@
 from pathlib import Path
 from beam import App, Image, Runtime, Volume, VolumeType
 
+from training import TrainingAPI
+from training_modules.config import training_arguments
+from training_modules.initialize import initialize
+
 training_app = App(
     name="train_qa",
     runtime=Runtime(
@@ -36,10 +40,11 @@ def train():
         model_cache_dir (str, optional): The directory where the trained model will be cached. Defaults to None.
     """
 
-    from training import TrainingAPI
-    from training_modules.config import training_arguments
+    # Be sure to initialize the environment variables before importing any other modules.
+    logging_config_path = "logging.yaml"
+    env_file_path = ".env"
+    initialize(logging_config_path=logging_config_path, env_file_path=env_file_path)
 
-    print("Path: ", Path.cwd())
     path_dataset = "./qa_dataset/dataset" #"dataset"
     path_model_cache = "./model_cache" #if path_model_cache else None
 
