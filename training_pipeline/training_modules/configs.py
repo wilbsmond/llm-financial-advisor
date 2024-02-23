@@ -70,26 +70,24 @@ class TrainingConfig:
         """
 
         return TrainingArguments(
-    output_dir="./results",
-    num_train_epochs=1,
-    per_device_train_batch_size=1, # Batch size per GPU for training
-    per_device_eval_batch_size=1, # Batch size per GPU for evaluation
-    gradient_accumulation_steps=2, # Number of update steps to accumulate the gradients for
-    optim="paged_adamw_32bit", # Optimizer to use
-    save_steps=5, # Save checkpoint every X updates steps
-    logging_steps=5, # Log every X updates steps
-    learning_rate=2e-4, # Initial learning rate (AdamW optimizer)
-    weight_decay=0.001, # Weight decay to apply to all layers except bias/LayerNorm weights
-    fp16=True, # Enable fp16/bf16 training 
-    #bf16=bf16, #(set bf16 to True with an A100)
-    max_grad_norm=0.3, # # Maximum gradient normal (gradient clipping)
-    max_steps=-1, # Number of training steps (overrides num_train_epochs)
-    warmup_ratio=0.03, # Ratio of steps for a linear warmup (from 0 to learning rate)
-    #group_by_length=True, # Group sequences into batches with same length. Saves memory and speeds up training considerably
-    lr_scheduler_type="constant", # Learning rate schedule
-    evaluation_strategy="steps",
-    eval_steps=5,
-    report_to="comet_ml", # or W&B / comet_ml
-    seed=42,
-    load_best_model_at_end=True
-)
+            output_dir=str(output_dir),
+            logging_dir=f"{str(output_dir)}/logs",
+            per_device_train_batch_size=training_config["per_device_train_batch_size"],
+            gradient_accumulation_steps=training_config["gradient_accumulation_steps"],
+            per_device_eval_batch_size=training_config["per_device_eval_batch_size"],
+            eval_accumulation_steps=training_config["eval_accumulation_steps"],
+            optim=training_config["optim"],
+            save_steps=training_config["save_steps"],
+            logging_steps=training_config["logging_steps"],
+            learning_rate=training_config["learning_rate"],
+            fp16=training_config["fp16"],
+            max_grad_norm=training_config["max_grad_norm"],
+            num_train_epochs=training_config["num_train_epochs"],
+            warmup_ratio=training_config["warmup_ratio"],
+            lr_scheduler_type=training_config["lr_scheduler_type"],
+            evaluation_strategy=training_config["evaluation_strategy"],
+            eval_steps=training_config["eval_steps"],
+            #report_to=training_config["report_to"],
+            seed=training_config["seed"],
+            load_best_model_at_end=training_config["load_best_model_at_end"],
+        )

@@ -1,3 +1,9 @@
+"""
+This script defines a PromptTemplate class that assists in generating 
+conversation/prompt templates. The script facilitates formatting prompts 
+for inference and training by combining various context elements and user inputs.
+"""
+
 from dataclasses import dataclass
 from typing import Dict, List, Union
 
@@ -16,6 +22,12 @@ class PromptTemplate:
     eos: str = ""
 
     @property
+    def input_variables(self) -> List[str]:
+        """Returns a list of input variables for the prompt template"""
+
+        return ["user_context", "news_context", "chat_history", "question", "answer"]
+
+    @property
     def train_raw_template(self):
         """Returns the training prompt template format"""
 
@@ -27,6 +39,16 @@ class PromptTemplate:
 
         return f"{system}{context}{chat_history}{question}{answer}{self.eos}"
 
+    @property
+    def infer_raw_template(self):
+        """Returns the inference prompt template format"""
+
+        system = self.system_template.format(system_message=self.system_message)
+        context = f"{self.sep}{self.context_template}"
+        chat_history = f"{self.sep}{self.chat_history_template}"
+        question = f"{self.sep}{self.question_template}"
+
+        return f"{system}{context}{chat_history}{question}{self.eos}"
 
     def format_train(self, sample: Dict[str, str]) -> Dict[str, Union[str, Dict]]:
         """Formats the data sample to a training sample"""
@@ -39,6 +61,17 @@ class PromptTemplate:
             answer=sample["answer"],
         )
 
+        return {"prompt": prompt, "payload": sample}
+
+    def format_infer(self, sample: Dict[str, str]) -> Dict[str, Union[str, Dict]]:
+        """Formats the data sample to a testing sample"""
+
+        prompt = self.infer_raw_template.format(
+            user_context=sample["user_context"],
+            news_context=sample["news_context"],
+            chat_history=sample.get("chat_history", ""),
+            question=sample["question"],
+        )
         return {"prompt": prompt, "payload": sample}
 
 # Global Templates registry

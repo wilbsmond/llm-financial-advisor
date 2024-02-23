@@ -96,10 +96,11 @@ class TrainingAPI:
     def __init__(self, training_config, path_dataset, path_model_cache):
         self.path_dataset = path_dataset
         self.path_model_cache = path_model_cache
-
-        self.llm_template_name = "falcon"
-        self.model_id = "tiiuae/falcon-7b-instruct"
-        self.training_arguments = training_config
+        
+        self.training_arguments = training_config.training
+        self.llm_template_name = training_config.model["template"]
+        self.model_id = training_config.model["id"]
+        self.max_seq_length = training_config.model["max_seq_length"]
 
         self.training_dataset, self.validation_dataset = self.load_data()
         self.model, self.tokenizer, self.peft_config = self.load_model()
@@ -162,7 +163,7 @@ class TrainingAPI:
             eval_dataset = self.validation_dataset, # mlabonne doesn't use this
             peft_config = self.peft_config,
             dataset_text_field = "prompt",
-            max_seq_length = 1024, # mlabonne uses None
+            max_seq_length = self.max_seq_length,
             tokenizer = self.tokenizer,
             args = self.training_arguments,
             packing = True,

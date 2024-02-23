@@ -4,6 +4,10 @@ from beam import App, Image, Runtime, Volume, VolumeType
 from training import TrainingAPI
 from training_modules.configs import TrainingConfig
 from training_modules.initialize import initialize
+from training_modules import utils
+
+import logging
+logger = logging.getLogger(__name__)
 
 training_app = App(
     name="train_qa",
@@ -45,6 +49,11 @@ def train():
     env_file_path = ".env"
     initialize(logging_config_path=logging_config_path, env_file_path=env_file_path)
 
+    logger.info("#" * 100)
+    utils.log_available_gpu_memory()
+    utils.log_available_ram()
+    logger.info("#" * 100)
+
     path_dataset = "./qa_dataset/dataset" #"dataset"
     path_model_cache = "./model_cache" #if path_model_cache else None
     path_config = "configs/dev_training_config.yaml"
@@ -52,7 +61,7 @@ def train():
 
     training_config = TrainingConfig.from_yaml(path_config, path_output)
     training_api = TrainingAPI(
-        training_config=training_config.training,
+        training_config=training_config,
         path_dataset=path_dataset,
         path_model_cache=path_model_cache,
     )

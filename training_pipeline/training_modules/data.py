@@ -6,6 +6,7 @@ from typing import Dict, List, Optional
 from datasets import Dataset
 from unstructured.cleaners.core import clean_extra_whitespace, group_broken_paragraphs
 
+from training_modules.constants import Scope
 from training_modules.prompt_templates import get_llm_template
 
 # Deserialize data
@@ -29,7 +30,7 @@ class DataSample:
     answer: str = ""
 
 class FinanceDataset:
-    def __init__(self, path_data: Path, template_name: str = "falcon"):
+    def __init__(self, path_data: Path, scope: Scope = Scope.TRAINING, template_name: str = "falcon"):
         """
         A class representing a finance dataset.
 
@@ -39,6 +40,7 @@ class FinanceDataset:
         """
 
         self.path_data = path_data
+        self.scope = scope
         self.template_name = template_name
 
     def load_data(self, path_data: Path) -> List:
@@ -69,16 +71,27 @@ class FinanceDataset:
             List[DataSample]: The deserialized data.
         """
 
-        return [
-            DataSample(
-                user_context=sample["about_me"],
-                news_context=sample["context"],
-                chat_history=sample.get("chat_history", ""),
-                question=sample["question"],
-                answer=sample["response"],
-            )
-            for sample in data
-        ]
+        if self.scope == Scope.TRAINING:
+            return [
+                DataSample(
+                    user_context=sample["about_me"],
+                    news_context=sample["context"],
+                    chat_history=sample.get("chat_history", ""),
+                    question=sample["question"],
+                    answer=sample["response"],
+                )
+                for sample in data
+            ]
+        else:
+            return [
+                DataSample(
+                    user_context=sample["about_me"],
+                    news_context=sample["context"],
+                    chat_history=sample.get("chat_history", ""),
+                    question=sample["question"],
+                )
+                for sample in data
+            ]
         
     def clean_data(self, samples: Dict[str, str]) -> Dict[str, str]:
         """
@@ -113,7 +126,10 @@ class FinanceDataset:
         dataset = Dataset.from_list(data_as_dict)
 
         template = get_llm_template(self.template_name)
-        template_mapping_func = template.format_train
+        if self.scope == Scope.TRAINING:
+            template_mapping_func = template.format_train
+        else:
+            template_mapping_func = template.format_infer
 
         dataset = dataset.map(self.clean_data)
         dataset = dataset.map(template_mapping_func, remove_columns=dataset.column_names)
